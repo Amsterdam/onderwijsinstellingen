@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+
+  referentie_database:
+    image: amsterdam/postgres11
+    ports:
+      - "5416:5432"
+    environment:
+      POSTGRES_DB: dataservices
+      POSTGRES_USER: dataservices
+      POSTGRES_PASSWORD: insecure
+
+  dataprocessor:
+    build: src
+    container_name: dataprocessor
+    environment:
+      CONN_DATABASE_POSTGRES_DEFAULT:
+        "postgresql://${db_user}:${db_pass}@${db_host}:${db_port}\
+        /${db_name}"
+      SHARED_DIR: /tmp
+      CONN_ONDERWIJSDATA_DUO_BASE_URL: "https://test-onderwijsdata.duo.nl/dataset/1a3bde53-5b00-4669-981a-d6e910724c28/resource/"
+    volumes:
+      - ./src/dataprocessing:/usr/local/data_processor/dataprocessing
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+
